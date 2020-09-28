@@ -1,4 +1,4 @@
-# aws-ocp-kubernetes-ansible-vagrant
+#aws-kubernetes-ansible-vagrant
 
 Prerequisites
 Hardware:
