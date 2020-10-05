@@ -1,6 +1,6 @@
 #aws-kubernetes-ansible-vagrant
 
-Prerequisites
+#Prerequisites
 Hardware:
 
 A Linux machine (This tutorial uses Ubuntu 20.04) with at least 8 GB of RAM and 15 GB.
@@ -11,7 +11,7 @@ Description: Ubuntu 20.04 LTS
 Release: 20.04
 Codename: focal
 
-Software:
+#Software:
 
 Vagrant 2.2.9
 wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.deb
@@ -21,8 +21,10 @@ sudo apt install virtualbox
 Ansible 2.9.6
 sudo apt-add-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible
-File structure
-The code used to create a Kubernetes Cluster with Vagrant and Ansible consists of:
+
+#File structure
+
+#The code used to create a Kubernetes Cluster with Vagrant and Ansible consists of:
 
 .vagrant / : hidden directory used by Vagrant to manage resources. Includes the generated vagrant_ansible_inventory inventory that Ansible will use to identify each VM's membership in the master or worker / node group and install the correct roles.
 add_packages : Ansible playbook to install / remove software packages in Ubuntu using APT.
@@ -41,9 +43,10 @@ The network of the Kubernetes cluster and the Virtualbox machines will be made u
 LAN, NAT, HOST Only and Tunnel Kubernetes networks
 Kubernetes Network Overview
 Kubernetes External Network in VirtualBox
+
 The VirtualBox HOST ONLY network is the network used to access the Kubernetes master and nodes from outside of VirtualBox. We will consider it as the equivalent of a public network within our development environment.
 
-The diagram is shown in green with connections to each virtual machine and to the VirtualBox router in its virtual vboxnet interface:
+#The diagram is shown in green with connections to each virtual machine and to the VirtualBox router in its virtual vboxnet interface:
 
 K8S-M-1 at eth1: 192.168.50.11
 K8S-N-1 at eth1: 192.168.50.12
@@ -58,6 +61,7 @@ default _gateway         0 . 0 . 0 . 0          UG     100 0 0 enx106530cde22a
 link-local       0 . 0 . 0 . 0 255,255 . 0 . 0      U      1000 0 0 enx106530cde22a                    
 192.168 . 50 . 0 0 . 0 . 0 . 0 255,255 . 255 . 0    U      0 0 0 vboxnet0                           
 192.168 . 100 . 0 0 . 0 . 0 . 0 255,255 . 255 . 0    U      100 0 0 enx106530cde22a                        
+
 Applications published through a Kubernetes NodePort will be available on the IPs assigned to the Kubernetes virtual machines within the VirtualBox HOST ONLY network
 
 For example, to access an application published on NodePort 30000 the following URLs will be used from outside the Kubernetes cluster:
@@ -107,7 +111,7 @@ It is not possible to access the IPs of the CLUSTER-IP range from outside the cl
 
 See “ Publish an Application outside Kubernetes Cluster ” for an explanation of how to publish a Kubernetes application.
 
-Vagrantfile
+#Vagrantfile
 The Vagrantfile file defines the hardware configuration of the virtual machines that will be created by Vagrant and executed in VirtualBox. In addition, the Ansible playbook that will be run to provision them is defined.
 
 IMAGE_NAME = "bento / ubuntu-20.04"
@@ -167,7 +171,8 @@ Vagrant. configure ( "2" ) do | config |
         end
     end
 end
-Kubernetes nodes features:
+
+#Kubernetes nodes features:
 
 Node	characteristics	Value
 K8S Master	CPU	2 cores
@@ -176,13 +181,13 @@ Worker 1… N	CPU	4 cores
 RAM	2 GB
 Lines 1 through 7 define the properties of the Kubernetes cluster:
 
-IMAGE_NAME : is the box (virtual machine) that Vagrant will download and use to create the cluster machines. We will use a machine identified as "bento / ubuntu-18.04", which corresponds to a minimal installation of Ubuntu 18.04 packaged by the Bento project.
-K8S_NAME : name that the cluster will have and that will be used to identify the command to join nodes to the master. In our example it is “ditwl-k8s-01”, an acronym for Demo IT Wonder Lab Kubernetes (k8s) and 01, the cluster number.
-MASTERS_NUM : number of master nodes, it is used to create a cluster with high availability on the master nodes. It is not implemented in the Ansible code so currently the maximum number of teachers is 1.
-MASTERS_MEM / NODES_MEM - Amount of memory in megabytes for each Kubernetes master / node.
-MASTERS_CPU / NODOS_CPU : number of CPUs available for each master / node.
-NODES_NUM = Number of Kubernetes worker nodes. They are the nodes that run the PODs through containers, we will create 2 nodes.
-IP_BASE = First octets of the IP address that we will use to define the network Kubernetes external network in VirtualBox, that is, the external interfaces of the VirtualBox machines, in the example they will be assigned:
+#IMAGE_NAME : is the box (virtual machine) that Vagrant will download and use to create the cluster machines. We will use a machine identified as "bento / ubuntu-18.04", which corresponds to a minimal installation of Ubuntu 18.04 packaged by the Bento project.
+#K8S_NAME : name that the cluster will have and that will be used to identify the command to join nodes to the master. In our example it is “ditwl-k8s-01”, an acronym for Demo IT Wonder Lab Kubernetes (k8s) and 01, the cluster number.
+#MASTERS_NUM : number of master nodes, it is used to create a cluster with high availability on the master nodes. It is not implemented in the Ansible code so currently the maximum number of teachers is 1.
+#MASTERS_MEM / NODES_MEM - Amount of memory in megabytes for each Kubernetes master / node.
+#MASTERS_CPU / NODOS_CPU : number of CPUs available for each master / node.
+#NODES_NUM = Number of Kubernetes worker nodes. They are the nodes that run the PODs through containers, we will create 2 nodes.
+#IP_BASE = First octets of the IP address that we will use to define the network Kubernetes external network in VirtualBox, that is, the external interfaces of the VirtualBox machines, in the example they will be assigned:
 192.168.50.1 for the vboxnet0
 192.168.50.11 for k8s-m-1 (Kubernetes master node 1)
 192.168.50.12 for k8s-n-1 (Kubernetes worker node 1)
@@ -204,7 +209,7 @@ Kubernetes worker nodes are created between lines 42 and 64 using code similar t
 
 The name of the nodes will be created using the expression "k8s-n - # {j}" that identifies the machine as belonging to the cluster of k8s, as node "n" and with a number (using the loop variable j)
 
-Ansible
+#Ansible
 Playbook k8s.yml
 
 The playbook run by Vagrant's Ansible provisioner, Selects the hosts using a wildcard pattern (k8s-m- * and k8s-n- *) that allows to differentiate between master and nodes.
@@ -331,7 +336,8 @@ k8s_common_remove_packages_names:
 - name:
 k8s_common_admin_user:   "ubuntu"
 k8s_common_admin_group: "ubuntu"
-The Ansible k8s / common playbook:
+
+#The Ansible k8s / common playbook:
 
 - name: Remove current swaps from fstab < br >   lineinfile: < br >     dest: / etc / fstab < br >     regexp: '^ / [S] + s + nones + swap < br >     state: absent
 - name: Disable swap
@@ -357,12 +363,13 @@ The Ansible k8s / common playbook:
 roles / add_packages
 The add_packages role is specialized in installing and removing software packages.
 
-Steps:
+#Steps:
 
 Add public keys from repositories,
 Add repositories to sources
 Update the package cache (if repositories have been added),
 Remove packages
+
 Install packages
 ---
 - name: Add new repositories keys
